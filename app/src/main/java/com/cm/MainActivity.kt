@@ -1,47 +1,46 @@
 package com.cm
 
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.widget.Button
+import android.widget.EditText
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var txtTime: TextView
-    private lateinit var btnSave: Button
+    private lateinit var status: TextView
+    private lateinit var interval: EditText
+    private lateinit var delay: EditText
+    private lateinit var btnStart: Button
+    private lateinit var btnAdd: Button
 
-    private val handler = Handler(Looper.getMainLooper())
-
-    private val clockRunnable = object : Runnable {
-        override fun run() {
-            val sdf = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
-            txtTime.text = sdf.format(Date())
-            handler.postDelayed(this, 1000)
-        }
-    }
+    private var running = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        txtTime = findViewById(R.id.time)
-        btnSave = findViewById(R.id.save)
+        status = findViewById(R.id.status)
+        interval = findViewById(R.id.interval)
+        delay = findViewById(R.id.delay)
+        btnStart = findViewById(R.id.btnStart)
+        btnAdd = findViewById(R.id.btnAdd)
 
-        btnSave.setOnClickListener {
-            Toast.makeText(this, "Settings disimpan", Toast.LENGTH_SHORT).show()
+        btnStart.setOnClickListener {
+
+            running = !running
+
+            if (running) {
+                status.text = "Status : RUNNING"
+                btnStart.text = "STOP"
+            } else {
+                status.text = "Status : STOP"
+                btnStart.text = "START"
+            }
         }
 
-        handler.post(clockRunnable)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        handler.removeCallbacks(clockRunnable)
+        btnAdd.setOnClickListener {
+            status.text = "Point berhasil ditambahkan"
+        }
     }
 }
