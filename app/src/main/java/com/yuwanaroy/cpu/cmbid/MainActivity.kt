@@ -1,112 +1,78 @@
 package com.yuwanaroy.cpu.cmbid
 
-import android.content.BroadcastReceiver
+import android.Manifest
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.widget.Button
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.yuwanaroy.cpu.cmbid.databinding.ActivityMainBinding
-import com.yuwanaroy.cpu.cmbid.model.Point
-import com.yuwanaroy.cpu.cmbid.service.CMAccessibilityService
 import com.yuwanaroy.cpu.cmbid.service.CMForegroundService
 import com.yuwanaroy.cpu.cmbid.service.FloatingService
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityMainBinding
-    private val pointList = ArrayList<Point>()
-    private lateinit var adapter: ItemAdapter
-    private var isRunning = false
+    private lateinit var btnStart: Button
+    private lateinit var btnStop: Button
 
-    private val stopReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            if (intent?.action == "ACTION_STOP_CM_BID") {
-                isRunning = false
-                stopAllService()
-                updateStatus("STOP")
-                Toast.makeText(this@MainActivity, "Auto Click Dihentikan", Toast.LENGTH_SHORT).show()
-            }
+    // Minta izin notifikasi Android 13+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (!isGranted) {
+            Toast.makeText(this, "Izin Notifikasi ditolak", Toast.LENGTH_SHORT).show()
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        setupRecyclerView()
-        setupClickListeners()
-        updateStatus("STOP")
-    }
+        setContentView(R.layout.activity_main) // nanti kita bikin layoutnya
 
-    override fun onStart() {
-        super.onStart()
-        val filter = IntentFilter("ACTION_STOP_CM_BID")
+        btnStart = findViewById(R.id.btnStart)
+        btnStop = findViewById(R.id.btnStop)
+
+        // 1. Minta izin Notifikasi
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            registerReceiver(stopReceiver, filter, Context.RECEIVER_NOT_EXPORTED)
-        } else {
-            @Suppress("DEPRECATION")
-            registerReceiver(stopReceiver, filter)
+            requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+
+        // 2. Cek Izin Overlay
+        if (!Settings.canDrawOverlays(this)) {
+            val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
+            startActivity(intent)
+            Toast.makeText(this, "Mohon aktifkan izin Tampilkan di atas aplikasi lain", Toast.LENGTH_LONG).show()
+        }
+
+        // 3. Cek Accessibility
+        if (!isAccessibilityServiceEnabled()) {
+            Toast.makeText(this, "Mohon aktifkan Layanan Aksesibilitas CM BID", Toast.LENGTH_LONG).show()
+            startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+        }
+
+        btnStart.setOnClickListener {
+            startService(Intent(this, CMForegroundService::class.java))
+            startService(Intent(this, FloatingService::class.java))
+            Toast.makeText(this, "CM BID Dijalankan", Toast.LENGTH_SHORT).show()
+        }
+
+        btnStop.setOnClickListener {
+            stopService(Intent(this, CMForegroundService::class.java))
+            stopService(Intent(this, FloatingService::class.java))
+            Toast.makeText(this, "CM BID Dihentikan", Toast.LENGTH_SHORT).show()
         }
     }
 
-    override fun onStop() {
-        super.onStop()
-        // FIX: BUNGKUS TRY CATCH BIAR ANTI CRASH
-        try {
-            unregisterReceiver(stopReceiver)
-        } catch (_: IllegalArgumentException) {
-            // Receiver sudah tidak terdaftar, abaikan
-        }
+    private fun isAccessibilityServiceEnabled(): Boolean {
+        val expectedComponentName = "$packageName/.service.CMAccessibilityService"
+        val services = Settings.Secure.getString(contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES)
+        return services?.contains(expectedComponentName) == true
     }
-
-    private fun setupRecyclerView() {
-        adapter = ItemAdapter(pointList) { pos ->
-            pointList.removeAt(pos)
-            adapter.notifyItemRemoved(pos)
-        }
-        binding.rvPoint.layoutManager = LinearLayoutManager(this)
-        binding.rvPoint.adapter = adapter
-    }
-
-    private fun setupClickListeners() {
-        binding.btnAddPoint.setOnClickListener {
-            val interval = binding.etInterval.text.toString().toLongOrNull() ?: 0L
-            val delay = binding.etDelay.text.toString().toLongOrNull() ?: 0L
-            val minHarga = binding.etMin.text.toString().toIntOrNull() ?: 0
-            val maxHarga = binding.etMax.text.toString().toIntOrNull() ?: 0
-            val jarak = binding.etJarak.text.toString().toIntOrNull() ?: 0
-
-            if (interval > 0 && delay > 0 && minHarga > 0 && maxHarga > 0) {
-                pointList.add(Point(0,0, interval, delay, minHarga, maxHarga, jarak))
-                adapter.notifyItemInserted(pointList.size - 1)
-                Toast.makeText(this, "Pengaturan Disimpan", Toast.LENGTH_SHORT).show()
-                binding.etInterval.text.clear()
-                binding.etDelay.text.clear()
-                binding.etMin.text.clear()
-                binding.etMax.text.clear()
-                binding.etJarak.text.clear()
-            } else {
-                Toast.makeText(this, "Semua field wajib diisi", Toast.LENGTH_SHORT).show()
-            }
-        }
-
-        binding.btnStart.setOnClickListener {
-            if (pointList.isEmpty()) {
-                Toast.makeText(this, "Tambah pengaturan dulu", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-            isRunning = !isRunning
-            if (isRunning) {
-                updateStatus("RUNNING")
-                startAllService()
-                Toast.makeText(this, "Auto Click Dimulai", Toast.LENGTH_SHORT).show()
-            } else {
+}            } else {
                 updateStatus("STOP")
                 stopAllService()
                 Toast.makeText(this, "Auto Click Dihentikan", Toast.LENGTH_SHORT).show()
