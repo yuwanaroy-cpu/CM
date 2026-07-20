@@ -4,29 +4,30 @@ import android.content.Context
 
 class PreferenceManager(context: Context) {
 
-    private val prefs = context.getSharedPreferences("cm_settings", Context.MODE_PRIVATE)
+    private val prefs =
+        context.getSharedPreferences("cm_settings", Context.MODE_PRIVATE)
 
-    fun setInterval(value: Int) {
-        prefs.edit().putInt("interval", value).apply()
-    }
+    var interval: Int
+        get() = prefs.getInt("interval", 100)
+        set(value) = prefs.edit().putInt("interval", value).apply()
 
-    fun getInterval(): Int {
-        return prefs.getInt("interval", 100)
-    }
+    var delay: Int
+        get() = prefs.getInt("delay", 0)
+        set(value) = prefs.edit().putInt("delay", value).apply()
 
-    fun setDelay(value: Int) {
-        prefs.edit().putInt("delay", value).apply()
-    }
+    var distanceEnabled: Boolean
+        get() = prefs.getBoolean("distance_enabled", false)
+        set(value) = prefs.edit().putBoolean("distance_enabled", value).apply()
 
-    fun getDelay(): Int {
-        return prefs.getInt("delay", 0)
-    }
+    var minPrice: Int
+        get() = prefs.getInt("min_price", 0)
+        set(value) = prefs.edit().putInt("min_price", value).apply()
 
-    fun setRepeat(value: Int) {
-        prefs.edit().putInt("repeat", value).apply()
-    }
+    var maxPrice: Int
+        get() = prefs.getInt("max_price", 100000)
+        set(value) = prefs.edit().putInt("max_price", value).apply()
 
-    fun getRepeat(): Int {
-        return prefs.getInt("repeat", -1)
-    }
+    var distance: Int
+        get() = prefs.getInt("distance", 1000)
+        set(value) = prefs.edit().putInt("distance", value).apply()
 }
