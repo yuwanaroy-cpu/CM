@@ -1,9 +1,11 @@
 package com.cm.model
 
 data class Point(
-    val interval: Int,
-    val delay: Int,
-    val minHarga: Int,
-    val maxHarga: Int,
-    val jarak: Int
+    val x: Int,          // posisi klik X
+    val y: Int,          // posisi klik Y
+    val interval: Int,   // interval autobid
+    val delay: Int,      // jeda klik
+    val minHarga: Int,   // harga minimal
+    val maxHarga: Int,   // harga maksimal
+    val jarak: Int       // filter jarak meter
 )
