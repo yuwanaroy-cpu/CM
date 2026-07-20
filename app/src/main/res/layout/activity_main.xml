@@ -1,108 +1,235 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="#F5F5F7"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="20dp">
+        android:padding="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="CM"
-            android:textStyle="bold"
-            android:textSize="32sp" />
-
-        <TextView
-            android:id="@+id/status"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Status : STOP"
-            android:textSize="18sp" />
-
-        <EditText
-            android:id="@+id/interval"
+        <!-- HEADER -->
+        <LinearLayout
+            android:background="#6A4C93"
+            android:padding="20dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:hint="Interval (ms)"
-            android:inputType="number" />
+            android:orientation="vertical"
+            android:layout_marginBottom="16dp">
 
-        <EditText
-            android:id="@+id/delay"
+            <TextView
+                android:text="CM AUTO BID"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp"
+                android:background="#4A306D"
+                android:padding="8dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:text="Status : "
+                    android:textColor="#FFFFFF"
+                    android:textSize="14sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+                <TextView
+                    android:id="@+id/tvStatus"
+                    android:text="STOP"
+                    android:textColor="#FF5252"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- CARD KECEPATAN -->
+        <LinearLayout
+            android:background="#FFFFFF"
+            android:padding="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:hint="Delay (ms)"
-            android:inputType="number" />
+            android:orientation="vertical"
+            android:layout_marginBottom="12dp">
 
-        <Switch
-            android:id="@+id/switchAutobidDistance"
+            <TextView
+                android:text="PENGATURAN KECEPATAN"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:textColor="#6A4C93"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp" />
+
+            <TextView android:text="Interval (ms)" android:textSize="12sp" android:textColor="#555"/>
+            <EditText
+                android:id="@+id/etInterval"
+                android:background="#F0F0F0"
+                android:padding="10dp"
+                android:hint="300"
+                android:inputType="number"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:layout_marginBottom="10dp" />
+
+            <TextView android:text="Delay (ms)" android:textSize="12sp" android:textColor="#555"/>
+            <EditText
+                android:id="@+id/etDelay"
+                android:background="#F0F0F0"
+                android:padding="10dp"
+                android:hint="150"
+                android:inputType="number"
+                android:layout_width="match_parent"
+                android:layout_height="45dp" />
+        </LinearLayout>
+
+        <!-- CARD ATURAN BID - UDAH GANTI JADI EDITTEXT -->
+        <LinearLayout
+            android:background="#FFFFFF"
+            android:padding="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="Autobid Distance" />
+            android:orientation="vertical"
+            android:layout_marginBottom="16dp">
 
-        <TextView
-            android:id="@+id/txtMinPrice"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Harga Minimal : 0" />
+            <TextView
+                android:text="ATURAN BID"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:textColor="#6A4C93"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp" />
 
-        <SeekBar
-            android:id="@+id/seekMinPrice"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:max="100000" />
+            <!-- HARGA MINIMAL -->
+            <TextView android:text="Harga Minimal" android:textSize="12sp" android:textColor="#555"/>
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp">
+                <TextView
+                    android:text="Rp"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:padding="10dp"
+                    android:background="#E0E0E0"
+                    android:layout_width="wrap_content"
+                    android:layout_height="45dp"/>
+                <EditText
+                    android:id="@+id/etMin"
+                    android:background="#F0F0F0"
+                    android:padding="10dp"
+                    android:hint="10000"
+                    android:inputType="number"
+                    android:layout_width="0dp"
+                    android:layout_height="45dp"
+                    android:layout_weight="1"/>
+            </LinearLayout>
 
-        <TextView
-            android:id="@+id/txtMaxPrice"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="Harga Maksimal : 100000" />
+            <!-- HARGA MAKSIMAL -->
+            <TextView android:text="Harga Maksimal" android:textSize="12sp" android:textColor="#555"/>
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp">
+                <TextView
+                    android:text="Rp"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:padding="10dp"
+                    android:background="#E0E0E0"
+                    android:layout_width="wrap_content"
+                    android:layout_height="45dp"/>
+                <EditText
+                    android:id="@+id/etMax"
+                    android:background="#F0F0F0"
+                    android:padding="10dp"
+                    android:hint="50000"
+                    android:inputType="number"
+                    android:layout_width="0dp"
+                    android:layout_height="45dp"
+                    android:layout_weight="1"/>
+            </LinearLayout>
 
-        <SeekBar
-            android:id="@+id/seekMaxPrice"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:max="100000"
-            android:progress="100000" />
+            <!-- JARAK -->
+            <TextView android:text="Jarak Maksimal" android:textSize="12sp" android:textColor="#555"/>
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <EditText
+                    android:id="@+id/etJarak"
+                    android:background="#F0F0F0"
+                    android:padding="10dp"
+                    android:hint="1000"
+                    android:inputType="number"
+                    android:layout_width="0dp"
+                    android:layout_height="45dp"
+                    android:layout_weight="1"/>
+                <TextView
+                    android:text="Meter"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:padding="10dp"
+                    android:background="#E0E0E0"
+                    android:layout_width="wrap_content"
+                    android:layout_height="45dp"/>
+            </LinearLayout>
+        </LinearLayout>
 
-        <TextView
-            android:id="@+id/txtDistance"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="Jarak : 1000 m" />
-
-        <SeekBar
-            android:id="@+id/seekDistance"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:max="10000"
-            android:progress="1000" />
-
+        <!-- TOMBOL -->
         <Button
-            android:id="@+id/btnAdd"
+            android:id="@+id/btnAddPoint"
+            android:backgroundTint="#6A4C93"
+            android:textColor="#FFFFFF"
+            android:text=" SIMPAN PENGATURAN"
+            android:textStyle="bold"
+            android:drawableStart="@android:drawable/ic_menu_save"
+            android:drawablePadding="10dp"
+            android:textSize="16sp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="Add Point" />
+            android:layout_height="50dp"
+            android:layout_marginBottom="10dp"/>
 
         <Button
             android:id="@+id/btnStart"
+            android:backgroundTint="#4CAF50"
+            android:textColor="#FFFFFF"
+            android:text=" MULAI"
+            android:textStyle="bold"
+            android:drawableStart="@android:drawable/ic_media_play"
+            android:drawablePadding="10dp"
+            android:textSize="16sp"
             android:layout_width="match_parent"
+            android:layout_height="50dp"/>
+
+        <!-- LIST PENGATURAN YANG TERSIMPAN -->
+        <TextView
+            android:text="DAFTAR PENGATURAN"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:textColor="#6A4C93"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="START" />
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="8dp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvPoint"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:background="#FFFFFF"/>
 
     </LinearLayout>
-
 </ScrollView>
