@@ -1,5 +1,7 @@
 <resources>
-
-    <style name="Theme.CM" parent="Theme.Material3.DayNight.NoActionBar"/>
-
+    <style name="Theme.CMBid" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">#FF5722</item>
+        <item name="colorPrimaryDark">#E64A19</item>
+        <item name="colorAccent">#4CAF50</item>
+    </style>
 </resources>
