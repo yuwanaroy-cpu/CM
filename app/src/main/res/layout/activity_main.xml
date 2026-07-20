@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="#F5F5F7"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -11,13 +11,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+
         <!-- HEADER -->
         <LinearLayout
             android:background="#6A4C93"
             android:padding="20dp"
+            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
             android:layout_marginBottom="16dp">
 
             <TextView
@@ -26,7 +27,8 @@
                 android:textStyle="bold"
                 android:textColor="#FFFFFF"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"/>
+
 
             <LinearLayout
                 android:orientation="horizontal"
@@ -41,7 +43,8 @@
                     android:textColor="#FFFFFF"
                     android:textSize="14sp"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"/>
+
                 <TextView
                     android:id="@+id/tvStatus"
                     android:text="STOP"
@@ -49,18 +52,23 @@
                     android:textSize="14sp"
                     android:textStyle="bold"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"/>
+
             </LinearLayout>
+
         </LinearLayout>
 
-        <!-- CARD KECEPATAN -->
+
+
+        <!-- KECEPATAN -->
+
         <LinearLayout
             android:background="#FFFFFF"
             android:padding="16dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginBottom="12dp">
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
 
             <TextView
                 android:text="PENGATURAN KECEPATAN"
@@ -68,39 +76,55 @@
                 android:textStyle="bold"
                 android:textColor="#6A4C93"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp" />
+                android:layout_height="wrap_content"/>
 
-            <TextView android:text="Interval (ms)" android:textSize="12sp" android:textColor="#555"/>
+
+            <TextView
+                android:text="Interval (ms)"
+                android:textSize="12sp"
+                android:textColor="#555"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+
             <EditText
                 android:id="@+id/etInterval"
-                android:background="#F0F0F0"
-                android:padding="10dp"
                 android:hint="300"
                 android:inputType="number"
                 android:layout_width="match_parent"
-                android:layout_height="45dp"
-                android:layout_marginBottom="10dp" />
+                android:layout_height="45dp"/>
 
-            <TextView android:text="Delay (ms)" android:textSize="12sp" android:textColor="#555"/>
+
+            <TextView
+                android:text="Delay (ms)"
+                android:textSize="12sp"
+                android:textColor="#555"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+
             <EditText
                 android:id="@+id/etDelay"
-                android:background="#F0F0F0"
-                android:padding="10dp"
                 android:hint="150"
                 android:inputType="number"
                 android:layout_width="match_parent"
-                android:layout_height="45dp" />
+                android:layout_height="45dp"/>
+
         </LinearLayout>
 
-        <!-- CARD ATURAN BID -->
+
+
+
+        <!-- ATURAN BID -->
+
         <LinearLayout
             android:background="#FFFFFF"
             android:padding="16dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginBottom="16dp">
+            android:layout_marginTop="12dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
 
             <TextView
                 android:text="ATURAN BID"
@@ -108,126 +132,94 @@
                 android:textStyle="bold"
                 android:textColor="#6A4C93"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp" />
+                android:layout_height="wrap_content"/>
 
-            <TextView android:text="Harga Minimal" android:textSize="12sp" android:textColor="#555"/>
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp">
-                <TextView
-                    android:text="Rp"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:padding="10dp"
-                    android:background="#E0E0E0"
-                    android:layout_width="wrap_content"
-                    android:layout_height="45dp"/>
-                <EditText
-                    android:id="@+id/etMin"
-                    android:background="#F0F0F0"
-                    android:padding="10dp"
-                    android:hint="10000"
-                    android:inputType="number"
-                    android:layout_width="0dp"
-                    android:layout_height="45dp"
-                    android:layout_weight="1"/>
-            </LinearLayout>
 
-            <TextView android:text="Harga Maksimal" android:textSize="12sp" android:textColor="#555"/>
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp">
-                <TextView
-                    android:text="Rp"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:padding="10dp"
-                    android:background="#E0E0E0"
-                    android:layout_width="wrap_content"
-                    android:layout_height="45dp"/>
-                <EditText
-                    android:id="@+id/etMax"
-                    android:background="#F0F0F0"
-                    android:padding="10dp"
-                    android:hint="50000"
-                    android:inputType="number"
-                    android:layout_width="0dp"
-                    android:layout_height="45dp"
-                    android:layout_weight="1"/>
-            </LinearLayout>
+            <TextView
+                android:text="Harga Minimal"
+                android:textSize="12sp"
+                android:textColor="#555"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
 
-            <TextView android:text="Jarak Maksimal" android:textSize="12sp" android:textColor="#555"/>
-            <LinearLayout
-                android:orientation="horizontal"
+
+            <EditText
+                android:id="@+id/etMin"
+                android:hint="10000"
+                android:inputType="number"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <EditText
-                    android:id="@+id/etJarak"
-                    android:background="#F0F0F0"
-                    android:padding="10dp"
-                    android:hint="1000"
-                    android:inputType="number"
-                    android:layout_width="0dp"
-                    android:layout_height="45dp"
-                    android:layout_weight="1"/>
-                <TextView
-                    android:text="Meter"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:padding="10dp"
-                    android:background="#E0E0E0"
-                    android:layout_width="wrap_content"
-                    android:layout_height="45dp"/>
-            </LinearLayout>
+                android:layout_height="45dp"/>
+
+
+            <TextView
+                android:text="Harga Maksimal"
+                android:textSize="12sp"
+                android:textColor="#555"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+
+            <EditText
+                android:id="@+id/etMax"
+                android:hint="50000"
+                android:inputType="number"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"/>
+
+
+            <TextView
+                android:text="Jarak Maksimal (Meter)"
+                android:textSize="12sp"
+                android:textColor="#555"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+
+            <EditText
+                android:id="@+id/etJarak"
+                android:hint="1000"
+                android:inputType="number"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"/>
+
+
         </LinearLayout>
 
-        <!-- TOMBOL -->
-        <Button
-            android:id="@+id/btnAddPoint"
-            android:backgroundTint="#6A4C93"
-            android:textColor="#FFFFFF"
-            android:text=" SIMPAN PENGATURAN"
-            android:textStyle="bold"
-            android:drawableStart="@android:drawable/ic_menu_save"
-            android:drawablePadding="10dp"
-            android:textSize="16sp"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginBottom="10dp"/>
+
+
 
         <Button
-            android:id="@+id/btnStart"
-            android:backgroundTint="#4CAF50"
-            android:textColor="#FFFFFF"
-            android:text=" MULAI"
-            android:textStyle="bold"
-            android:drawableStart="@android:drawable/ic_media_play"
-            android:drawablePadding="10dp"
-            android:textSize="16sp"
+            android:id="@+id/btnAddPoint"
+            android:text="SIMPAN PENGATURAN"
             android:layout_width="match_parent"
             android:layout_height="50dp"/>
 
-        <!-- LIST -->
+
+        <Button
+            android:id="@+id/btnStart"
+            android:text="MULAI"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"/>
+
+
+
         <TextView
             android:text="DAFTAR PENGATURAN"
             android:textSize="13sp"
             android:textStyle="bold"
             android:textColor="#6A4C93"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:layout_marginBottom="8dp" />
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvPoint"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:background="#FFFFFF"/>
+            android:layout_height="200dp"/>
+
 
     </LinearLayout>
+
 </ScrollView>
