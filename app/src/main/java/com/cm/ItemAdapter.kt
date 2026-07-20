@@ -49,8 +49,7 @@ RecyclerView.Adapter<ItemAdapter.ViewHolder>() {
 
 
         holder.binding.tvItem.text =
-            "Rp${item.min} - Rp${item.max} | ${item.jarak} Meter"
-
+    "Rp${item.minHarga} - Rp${item.maxHarga} | ${item.jarak} Meter"
     }
 
 
