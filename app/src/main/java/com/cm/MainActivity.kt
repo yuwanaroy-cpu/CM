@@ -5,8 +5,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.cm.databinding.ActivityMainBinding
-import com.cm.model.Point // <- PENTING: import Point dari folder model
-import java.util.ArrayList // <- PENTING: import ArrayList
+import com.cm.model.Point
+import java.util.ArrayList
 
 class MainActivity : AppCompatActivity() {
 
