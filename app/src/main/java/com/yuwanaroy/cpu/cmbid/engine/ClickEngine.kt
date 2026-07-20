@@ -27,24 +27,26 @@ class ClickEngine {
     private fun runNextClick() {
         if (!isRunning) return
 
-        val point = pointList[currentIndex]
+        val settings = pointList[currentIndex]
 
-        // Delay awal
+        // 1. Coba klik dulu. Balik true kalau berhasil klik
+        val clicked = CMAccessibilityService.instance?.findAndClickValidPrice(settings)?: false
+
+        // 2. Kalau berhasil klik -> tunggu "delay". Kalau gagal -> langsung lanjut
+        val nextDelay = if (clicked) settings.delay else 0L
+
         handler.postDelayed({
-            // KLIK
-            CMAccessibilityService.instance?.performClick(point.x, point.y)
-            
-            // Scroll setelah klik kalau jarak > 0
-            if (point.jarak > 0) {
-                CMAccessibilityService.instance?.performScroll(point.jarak)
+            // 3. Pindah ke setting berikutnya
+            currentIndex = (currentIndex + 1) % pointList.size
+
+            // 4. Scroll kalau ada
+            if (settings.jarak > 0) {
+                CMAccessibilityService.instance?.performScroll(settings.jarak)
             }
 
-            // Pindah ke point berikutnya
-            currentIndex = (currentIndex + 1) % pointList.size
-            
-            // Loop dengan interval
-            handler.postDelayed({ runNextClick() }, point.interval)
+            // 5. Loop lagi dengan interval
+            handler.postDelayed({ runNextClick() }, settings.interval)
 
-        }, point.delay)
+        }, nextDelay)
     }
 }
