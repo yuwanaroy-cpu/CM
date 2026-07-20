@@ -5,198 +5,88 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.cm.databinding.ActivityMainBinding
-import com.cm.model.Point
-
+import com.cm.model.Point // <- PENTING: import Point dari folder model
+import java.util.ArrayList // <- PENTING: import ArrayList
 
 class MainActivity : AppCompatActivity() {
 
-
     private lateinit var binding: ActivityMainBinding
-
+    private val pointList = ArrayList<Point>()
+    private lateinit var adapter: PointAdapter
     private var isRunning = false
 
-    private val listPoint = ArrayList<Point>()
-
-    private lateinit var adapter: ItemAdapter
-
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
-
         super.onCreate(savedInstanceState)
-
         binding = ActivityMainBinding.inflate(layoutInflater)
-
         setContentView(binding.root)
 
-
         setupRecyclerView()
-
-        setupButtons()
-
+        setupClickListeners()
+        updateStatus("STOP")
     }
-
-
 
     private fun setupRecyclerView() {
-
-
-        adapter = ItemAdapter(listPoint)
-
-
-        binding.rvPoint.layoutManager =
-            LinearLayoutManager(this)
-
-
+        adapter = PointAdapter(pointList)
+        binding.rvPoint.layoutManager = LinearLayoutManager(this)
         binding.rvPoint.adapter = adapter
-
     }
 
-
-
-    private fun setupButtons() {
-
-
+    private fun setupClickListeners() {
         // Tombol SIMPAN PENGATURAN
-
         binding.btnAddPoint.setOnClickListener {
+            val interval = binding.etInterval.text.toString().toIntOrNull() ?: 0
+            val delay = binding.etDelay.text.toString().toIntOrNull() ?: 0
+            val minHarga = binding.etMin.text.toString().toIntOrNull() ?: 0
+            val maxHarga = binding.etMax.text.toString().toIntOrNull() ?: 0
+            val jarak = binding.etJarak.text.toString().toIntOrNull() ?: 0
 
-
-            val min =
-                binding.etMin.text.toString()
-                    .toIntOrNull() ?: 0
-
-
-            val max =
-                binding.etMax.text.toString()
-                    .toIntOrNull() ?: 0
-
-
-            val jarak =
-                binding.etJarak.text.toString()
-                    .toIntOrNull() ?: 0
-
-
-
-            if (min == 0 || max == 0) {
-
-
-                Toast.makeText(
-                    this,
-                    "Isi Harga Minimal & Maksimal",
-                    Toast.LENGTH_SHORT
-                ).show()
-
-
-                return@setOnClickListener
-
+            if (interval > 0 && delay > 0 && minHarga > 0 && maxHarga > 0) {
+                val point = Point(interval, delay, minHarga, maxHarga, jarak)
+                pointList.add(point)
+                adapter.notifyItemInserted(pointList.size - 1)
+                Toast.makeText(this, "Pengaturan Disimpan", Toast.LENGTH_SHORT).show()
+                
+                // Kosongin input
+                binding.etInterval.text.clear()
+                binding.etDelay.text.clear()
+                binding.etMin.text.clear()
+                binding.etMax.text.clear()
+                binding.etJarak.text.clear()
+            } else {
+                Toast.makeText(this, "Semua field wajib diisi", Toast.LENGTH_SHORT).show()
             }
-
-
-
-            val point =
-                Point(
-                    min,
-                    max,
-                    jarak
-                )
-
-
-            listPoint.add(point)
-
-
-            adapter.notifyItemInserted(
-                listPoint.size - 1
-            )
-
-
-
-            binding.etMin.text.clear()
-
-            binding.etMax.text.clear()
-
-            binding.etJarak.text.clear()
-
-
-
-            Toast.makeText(
-                this,
-                "Pengaturan Tersimpan!",
-                Toast.LENGTH_SHORT
-            ).show()
-
         }
 
-
-
-        // Tombol START / STOP
-
+        // Tombol MULAI
         binding.btnStart.setOnClickListener {
-
+            if (pointList.isEmpty()) {
+                Toast.makeText(this, "Tambah pengaturan dulu", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
 
             isRunning = !isRunning
-
-
-
             if (isRunning) {
-
-
-                binding.tvStatus.text =
-                    "RUNNING"
-
-
-                binding.tvStatus.setTextColor(
-                    getColor(android.R.color.holo_green_light)
-                )
-
-
-                binding.btnStart.text =
-                    " STOP"
-
-
-
-                binding.btnStart.setCompoundDrawablesWithIntrinsicBounds(
-                    android.R.drawable.ic_media_pause,
-                    0,
-                    0,
-                    0
-                )
-
-
-
+                updateStatus("RUNNING")
+                Toast.makeText(this, "Auto Bid Dimulai", Toast.LENGTH_SHORT).show()
+                // TODO: Jalankan service bid di sini
             } else {
-
-
-                binding.tvStatus.text =
-                    "STOP"
-
-
-
-                binding.tvStatus.setTextColor(
-                    getColor(android.R.color.holo_red_light)
-                )
-
-
-
-                binding.btnStart.text =
-                    " MULAI"
-
-
-
-                binding.btnStart.setCompoundDrawablesWithIntrinsicBounds(
-                    android.R.drawable.ic_media_play,
-                    0,
-                    0,
-                    0
-                )
-
+                updateStatus("STOP")
+                Toast.makeText(this, "Auto Bid Dihentikan", Toast.LENGTH_SHORT).show()
+                // TODO: Hentikan service bid di sini
             }
-
-
         }
-
-
     }
 
-
+    private fun updateStatus(status: String) {
+        binding.tvStatus.text = status
+        if (status == "RUNNING") {
+            binding.tvStatus.setTextColor(getColor(android.R.color.holo_green_dark))
+            binding.btnStart.text = " STOP"
+            binding.btnStart.backgroundTintList = getColorStateList(android.R.color.holo_red_dark)
+        } else {
+            binding.tvStatus.setTextColor(getColor(android.R.color.holo_red_dark))
+            binding.btnStart.text = " MULAI"
+            binding.btnStart.backgroundTintList = getColorStateList(android.R.color.holo_green_dark)
+        }
+    }
 }
