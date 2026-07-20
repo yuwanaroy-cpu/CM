@@ -1,44 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.yuwanaroy.cpu.cmbid">
 
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-sdk
+        android:minSdkVersion="24"
+        android:targetSdkVersion="34" />
 
+    <!-- ========== PERMISSIONS ========== -->
     <!-- Overlay / Floating -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
-    <!-- Accessibility -->
-    <uses-permission android:name="android.permission.BIND_ACCESSIBILITY_SERVICE" />
-
     <!-- Foreground Service -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+
+    <!-- Boot & Wake -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <!-- Network -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- Storage -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29" />
 
     <application
         android:allowBackup="true"
         android:icon="@drawable/cm_icon"
         android:roundIcon="@drawable/cm_icon"
-        android:label="CM AUTO BID"
+        android:label="CM BID"
         android:supportsRtl="true"
-        android:theme="@style/Theme.CM">
+        android:theme="@style/Theme.CMBid"
+        tools:targetApi="34">
 
-        <!-- Main Activity -->
+        <!-- ========== ACTIVITY ========== -->
         <activity
             android:name=".MainActivity"
-            android:exported="true">
-
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
 
-        <!-- Floating Service -->
+        <!-- ========== SERVICES ========== -->
+        
+        <!-- 1. FOREGROUND SERVICE - Notifikasi Permanen -->
+        <service
+            android:name=".service.CMForegroundService"
+            android:foregroundServiceType="dataSync"
+            android:exported="false" />
+
+        <!-- 2. FLOATING SERVICE - Tombol Melayang -->
         <service
             android:name=".service.FloatingService"
             android:exported="false" />
 
-        <!-- Accessibility Service -->
+        <!-- 3. ACCESSIBILITY SERVICE - Inti Auto Click -->
         <service
             android:name=".service.CMAccessibilityService"
+            android:label="CM BID Service"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
             android:exported="true">
 
@@ -51,6 +77,19 @@
                 android:resource="@xml/accessibility_config" />
 
         </service>
+
+        <!-- ========== RECEIVER ========== -->
+        
+        <!-- 4. BOOT RECEIVER - Auto Start -->
+        <receiver
+            android:name=".receiver.BootReceiver"
+            android:exported="true"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+            </intent-filter>
+        </receiver>
 
     </application>
 
