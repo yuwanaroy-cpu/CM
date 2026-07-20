@@ -1,6 +1,7 @@
 package com.cm.model
 
 data class Point(
-    val x: Int,
-    val y: Int
+    val min: Int,
+    val max: Int,
+    val jarak: Int
 )
