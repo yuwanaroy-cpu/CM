@@ -1,6 +1,9 @@
 package com.yuwanaroy.cpu.cmbid
 
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
@@ -12,7 +15,6 @@ import com.yuwanaroy.cpu.cmbid.model.Point
 import com.yuwanaroy.cpu.cmbid.service.CMAccessibilityService
 import com.yuwanaroy.cpu.cmbid.service.CMForegroundService
 import com.yuwanaroy.cpu.cmbid.service.FloatingService
-import java.util.ArrayList
 
 class MainActivity : AppCompatActivity() {
 
@@ -20,6 +22,18 @@ class MainActivity : AppCompatActivity() {
     private val pointList = ArrayList<Point>()
     private lateinit var adapter: PointAdapter
     private var isRunning = false
+
+    // Receiver buat nerima broadcast dari FloatingService tombol STOP
+    private val stopReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent?.action == "ACTION_STOP_CM_BID") {
+                isRunning = false
+                stopAllService()
+                updateStatus("STOP")
+                Toast.makeText(this@MainActivity, "Auto Click Dihentikan", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,6 +45,18 @@ class MainActivity : AppCompatActivity() {
         updateStatus("STOP")
     }
 
+    override fun onStart() {
+        super.onStart()
+        // Daftar receiver pas activity jalan
+        registerReceiver(stopReceiver, IntentFilter("ACTION_STOP_CM_BID"))
+    }
+
+    override fun onStop() {
+        super.onStop()
+        // Lepas receiver pas activity mati
+        unregisterReceiver(stopReceiver)
+    }
+
     private fun setupRecyclerView() {
         adapter = PointAdapter(pointList)
         binding.rvPoint.layoutManager = LinearLayoutManager(this)
@@ -38,7 +64,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupClickListeners() {
-        // SIMPAN PENGATURAN
+        // TOMBOL SIMPAN PENGATURAN
         binding.btnAddPoint.setOnClickListener {
             val interval = binding.etInterval.text.toString().toIntOrNull() ?: 0
             val delay = binding.etDelay.text.toString().toIntOrNull() ?: 0
@@ -47,10 +73,20 @@ class MainActivity : AppCompatActivity() {
             val jarak = binding.etJarak.text.toString().toIntOrNull() ?: 0
 
             if (interval > 0 && delay > 0 && minHarga > 0 && maxHarga > 0) {
-                val point = Point(x = 0, y = 0, interval = interval, delay = delay, minHarga = minHarga, maxHarga = maxHarga, jarak = jarak)
+                val point = Point(
+                    x = 0, 
+                    y = 0, 
+                    interval = interval, 
+                    delay = delay, 
+                    minHarga = minHarga, 
+                    maxHarga = maxHarga, 
+                    jarak = jarak
+                )
                 pointList.add(point)
                 adapter.notifyItemInserted(pointList.size - 1)
                 Toast.makeText(this, "Pengaturan Disimpan", Toast.LENGTH_SHORT).show()
+                
+                // Kosongin form
                 binding.etInterval.text.clear()
                 binding.etDelay.text.clear()
                 binding.etMin.text.clear()
@@ -61,7 +97,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // START / STOP
+        // TOMBOL MULAI / STOP
         binding.btnStart.setOnClickListener {
             if (pointList.isEmpty()) {
                 Toast.makeText(this, "Tambah pengaturan dulu", Toast.LENGTH_SHORT).show()
@@ -85,14 +121,19 @@ class MainActivity : AppCompatActivity() {
     private fun startAllService() {
         // 1. Cek izin Overlay
         if (!Settings.canDrawOverlays(this)) {
+            Toast.makeText(this, "Izinkan Tampilkan di atas aplikasi lain dulu", Toast.LENGTH_LONG).show()
             startActivity(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION))
+            isRunning = false
+            updateStatus("STOP")
             return
         }
         
         // 2. Cek izin Aksesibilitas
         if (CMAccessibilityService.instance == null) {
-            startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
             Toast.makeText(this, "Aktifkan CM BID di Aksesibilitas dulu", Toast.LENGTH_LONG).show()
+            startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+            isRunning = false
+            updateStatus("STOP")
             return
         }
 
@@ -108,7 +149,7 @@ class MainActivity : AppCompatActivity() {
         // 4. Nyalakan Floating Service - Tombol Melayang
         startService(Intent(this, FloatingService::class.java))
 
-        // 5. Nyalakan AutoClick
+        // 5. Nyalakan AutoClick di Accessibility Service
         CMAccessibilityService.instance?.startService(pointList)
     }
 
