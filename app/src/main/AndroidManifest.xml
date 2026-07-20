@@ -1,19 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- IZIN MINIMALIS -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/cm_icon"
+        android:roundIcon="@drawable/cm_icon"
         android:label="CM BID"
-        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.CMBID">
-        
+
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -23,7 +22,6 @@
             </intent-filter>
         </activity>
 
-        <!-- ACCESSIBILITY SERVICE -->
         <service
             android:name=".service.CMAccessibilityService"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
@@ -32,17 +30,16 @@
             <intent-filter>
                 <action android:name="android.accessibilityservice.AccessibilityService" />
             </intent-filter>
+
             <meta-data
                 android:name="android.accessibilityservice"
                 android:resource="@xml/accessibility_service_config" />
         </service>
 
-        <!-- FOREGROUND SERVICE -->
         <service
             android:name=".service.CMForegroundService"
             android:exported="false" />
 
-        <!-- FLOATING SERVICE -->
         <service
             android:name=".service.FloatingService"
             android:exported="false" />
