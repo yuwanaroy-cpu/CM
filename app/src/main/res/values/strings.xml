@@ -1,3 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <string name="app_name">CM BID</string>
+
+    <string name="accessibility_service_description">
+        Layanan Auto Click untuk CM BID
+    </string>
+
 </resources>
