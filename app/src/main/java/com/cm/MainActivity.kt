@@ -1,119 +1,89 @@
-package com.cm
+package com.cm.autobid
 
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
-import android.widget.SeekBar
-import android.widget.Switch
-import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.cm.utils.PreferenceManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.cm.autobid.databinding.ActivityMainBinding
+
+data class Point(val min: Int, val max: Int, val jarak: Int) // Data class buat nyimpen 1 aturan
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var pref: PreferenceManager
-
-    private lateinit var status: TextView
-    private lateinit var interval: EditText
-    private lateinit var delay: EditText
-
-    private lateinit var btnStart: Button
-    private lateinit var btnAdd: Button
-
-    private lateinit var switchAutobidDistance: Switch
-
-    private lateinit var seekMinPrice: SeekBar
-    private lateinit var seekMaxPrice: SeekBar
-    private lateinit var seekDistance: SeekBar
-
-    private lateinit var txtMinPrice: TextView
-    private lateinit var txtMaxPrice: TextView
-    private lateinit var txtDistance: TextView
-
-    private var running = false
+    private lateinit var binding: ActivityMainBinding
+    private var isRunning = false
+    private val listPoint = ArrayList<Point>() // List buat nyimpen semua pengaturan
+    private lateinit var adapter: PointAdapter // Adapter RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        pref = PreferenceManager(this)
+        setupRecyclerView()
+        setupButtons()
+    }
 
-        status = findViewById(R.id.status)
-        interval = findViewById(R.id.interval)
-        delay = findViewById(R.id.delay)
+    private fun setupRecyclerView() {
+        adapter = PointAdapter(listPoint)
+        binding.rvPoint.layoutManager = LinearLayoutManager(this)
+        binding.rvPoint.adapter = adapter
+    }
 
-        btnStart = findViewById(R.id.btnStart)
-        btnAdd = findViewById(R.id.btnAdd)
+    private fun setupButtons() {
+        binding.btnAddPoint.setOnClickListener {
+            val interval = binding.etInterval.text.toString()
+            val delay = binding.etDelay.text.toString()
+            val min = binding.etMin.text.toString().toIntOrNull()?: 0
+            val max = binding.etMax.text.toString().toIntOrNull()?: 0
+            val jarak = binding.etJarak.text.toString().toIntOrNull()?: 0
 
-        switchAutobidDistance = findViewById(R.id.switchAutobidDistance)
+            if(min == 0 || max == 0) {
+                Toast.makeText(this, "Isi Harga Minimal & Maksimal", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
 
-        seekMinPrice = findViewById(R.id.seekMinPrice)
-        seekMaxPrice = findViewById(R.id.seekMaxPrice)
-        seekDistance = findViewById(R.id.seekDistance)
+            listPoint.add(Point(min, max, jarak)) // Tambah ke list
+            adapter.notifyDataSetChanged() // Update RecyclerView
 
-        txtMinPrice = findViewById(R.id.txtMinPrice)
-        txtMaxPrice = findViewById(R.id.txtMaxPrice)
-        txtDistance = findViewById(R.id.txtDistance)
+            // Kosongkan field
+            binding.etMin.text.clear()
+            binding.etMax.text.clear()
+            binding.etJarak.text.clear()
 
-        // Muat pengaturan yang tersimpan
-        switchAutobidDistance.isChecked = pref.distanceEnabled
-        seekMinPrice.progress = pref.minPrice
-        seekMaxPrice.progress = pref.maxPrice
-        seekDistance.progress = pref.distance
-
-        updateLabel()
-
-        switchAutobidDistance.setOnCheckedChangeListener { _, checked ->
-            pref.distanceEnabled = checked
+            Toast.makeText(this, "Pengaturan Tersimpan!", Toast.LENGTH_SHORT).show()
         }
 
-        seekMinPrice.setOnSeekBarChangeListener(listener)
-        seekMaxPrice.setOnSeekBarChangeListener(listener)
-        seekDistance.setOnSeekBarChangeListener(listener)
-
-        btnStart.setOnClickListener {
-
-            running = !running
-
-            if (running) {
-                status.text = "Status : RUNNING"
-                btnStart.text = "STOP"
+        binding.btnStart.setOnClickListener {
+            isRunning =!isRunning
+            if (isRunning) {
+                binding.tvStatus.text = "RUNNING"
+                binding.tvStatus.setTextColor(resources.getColor(android.R.color.holo_green_light))
+                binding.btnStart.text = " STOP"
+                binding.btnStart.setCompoundDrawablesWithIntrinsicBounds(android.R.drawable.ic_media_pause, 0, 0, 0)
+                binding.btnStart.backgroundTintList = resources.getColorStateList(android.R.color.holo_red_dark)
             } else {
-                status.text = "Status : STOP"
-                btnStart.text = "START"
+                binding.tvStatus.text = "STOP"
+                binding.tvStatus.setTextColor(resources.getColor(android.R.color.holo_red_light))
+                binding.btnStart.text = " MULAI"
+                binding.btnStart.setCompoundDrawablesWithIntrinsicBounds(android.R.drawable.ic_media_play, 0, 0, 0)
+                binding.btnStart.backgroundTintList = resources.getColorStateList(android.R.color.holo_green_dark)
             }
         }
-
-        btnAdd.setOnClickListener {
-            status.text = "Point berhasil ditambahkan"
-        }
     }
+}
 
-    private val listener = object : SeekBar.OnSeekBarChangeListener {
-
-        override fun onProgressChanged(
-            seekBar: SeekBar?,
-            progress: Int,
-            fromUser: Boolean
-        ) {
-            updateLabel()
-
-            pref.minPrice = seekMinPrice.progress
-            pref.maxPrice = seekMaxPrice.progress
-            pref.distance = seekDistance.progress
-        }
-
-        override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-
-        override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+// Adapter sederhana buat nampilin list
+class PointAdapter(private val list: ArrayList<Point>) : androidx.recyclerview.widget.RecyclerView.Adapter<PointAdapter.ViewHolder>() {
+    class ViewHolder(val binding: android.view.View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(binding)
+    override fun onCreateViewHolder(parent: android.view.ViewGroup, viewType: Int): ViewHolder {
+        val view = android.view.LayoutInflater.from(parent.context).inflate(android.R.layout.simple_list_item_1, parent, false)
+        return ViewHolder(view)
     }
-
-    private fun updateLabel() {
-
-        txtMinPrice.text = "Harga Minimal : ${seekMinPrice.progress}"
-
-        txtMaxPrice.text = "Harga Maksimal : ${seekMaxPrice.progress}"
-
-        txtDistance.text = "Jarak : ${seekDistance.progress} m"
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val item = list[position]
+        (holder.binding as android.widget.TextView).text = "Rp${item.min} - Rp${item.max} | ${item.jarak} Meter"
+        holder.binding.setPadding(16,16,16,16)
     }
+    override fun getItemCount(): Int = list.size
 }
