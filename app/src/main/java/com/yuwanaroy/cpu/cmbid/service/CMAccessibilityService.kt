@@ -2,79 +2,125 @@ package com.yuwanaroy.cpu.cmbid.service
 
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.GestureDescription
+import android.content.Context
 import android.graphics.Path
-import android.graphics.Rect
+import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
-import com.yuwanaroy.cpu.cmbid.model.Point
+import kotlinx.coroutines.*
 
 class CMAccessibilityService : AccessibilityService() {
 
-    companion object { var instance: CMAccessibilityService? = null }
+    private val serviceScope = CoroutineScope(Dispatchers.Default + Job())
+    private var isRunning = false
+    private var scanJob: Job? = null
 
-    private val clickEngine = ClickEngine() // ✅ BALIK PAKE CLICKENGINE
+    private var clickDelay = 150L 
+    private var interval = 300L 
+    private var hargaMin = 10000
+    private var hargaMax = 50000
+    private var jarakMax = 1000
 
-    override fun onServiceConnected() { super.onServiceConnected(); instance = this }
-    override fun onDestroy() { super.onDestroy(); clickEngine.stop(); instance = null }
-    override fun onAccessibilityEvent(event: AccessibilityEvent?) {}
-    override fun onInterrupt() { clickEngine.stop() }
+    companion object { private const val TAG = "CMBID_Service" }
 
-    fun startService(points: List<Point>) { // ✅ PANGGIL CLICKENGINE
-        clickEngine.start(points)
+    override fun onServiceConnected() {
+        super.onServiceConnected()
+        loadSettings()
     }
 
-    fun stopService() { // ✅ PANGGIL CLICKENGINE
-        clickEngine.stop()
-    }
-
-    // FUNGSI BARU: DI PANGGIL CLICKENGINE
-    fun findAndClickValidPrice(settings: Point): Boolean {
-        val root = rootInActiveWindow?: return false
-        val nodes = root.findAccessibilityNodeInfosByText("Rp")
-
-        for (node in nodes) {
-            val text = node.text?.toString()?: continue
-            val harga = text.replace(Regex("[^0-9]"), "").toIntOrNull()?: continue
-
-            if (harga >= settings.minHarga && harga <= settings.maxHarga) {
-                val parent = findClickableParent(node)
-                if (parent!= null) {
-                    performClick(parent)
-                    return true // Kasih tau ClickEngine: "sudah klik"
-                }
+    override fun onAccessibilityEvent(event: AccessibilityEvent?) {
+        // PAKE EVENT LAGI BIAR HEMAT BATERAI
+        // Cuma scan pas ada perubahan, bukan tiap 300ms
+        if (!isRunning || event == null) return
+        
+        if (event.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED || 
+            event.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
+            
+            // Cancel job lama biar gak numpuk
+            scanJob?.cancel()
+            scanJob = serviceScope.launch {
+                delay(100) // kasih jeda kecil biar UI selesai render
+                findAndClickBidButton(rootInActiveWindow)
             }
         }
-        return false // Kasih tau ClickEngine: "gak nemu harga cocok"
     }
 
-    private fun findClickableParent(node: AccessibilityNodeInfo?): AccessibilityNodeInfo? {
-        var current = node
-        while (current!= null) {
-            if (current.isClickable) return current
-            if (current.text?.toString()?.contains("TERIMA", true) == true && current.isClickable) return current
-            current = current.parent
+    private suspend fun findAndClickBidButton(node: AccessibilityNodeInfo?) {
+        if (node == null) return // SAFETY 1
+        scanNode(node)
+    }
+
+    private suspend fun scanNode(node: AccessibilityNodeInfo) {
+        val text = node.text?.toString()?.lowercase()
+                
+        if (text != null && (text.contains("bid") || text.contains("terima") || text.contains("ambil"))) {
+            // FIX: KIRIM rootInActiveWindow YG BISA NULL
+            if (checkHargaDanJarak(rootInActiveWindow)) { 
+                performClick(node)
+                delay(clickDelay)
+            }
         }
-        return null
+
+        for (i in 0 until node.childCount) {
+            node.getChild(i)?.let { scanNode(it) }
+        }
     }
 
-    fun performClick(x: Int, y: Int) { // Dipake kalau mau klik koordinat
-        val path = Path().apply { moveTo(x.toFloat(), y.toFloat()) }
-        val gesture = GestureDescription.Builder().addStroke(GestureDescription.StrokeDescription(path, 0, 100)).build()
+    // FIX: TERIMA NULL
+    private fun checkHargaDanJarak(node: AccessibilityNodeInfo?): Boolean {
+        if (node == null) return false // SAFETY 2
+
+        var harga = 0
+        var jarak = 0
+        val allText = mutableListOf<String>()
+        collectText(node, allText)
+        
+        for (text in allText) {
+            if (text.contains("rp", true)) {
+                harga = text.replace("[^0-9]".toRegex(), "").toIntOrNull() ?: 0
+            }
+            if ((text.contains("m") || text.contains("km")) && !text.contains("rp", true)) {
+                jarak = text.replace("[^0-9]".toRegex(), "").toIntOrNull() ?: 0
+            }
+        }
+        Log.d(TAG, "Cek Harga: $harga, Jarak: $jarak")
+        return harga in hargaMin..hargaMax && jarak <= jarakMax
+    }
+
+    private fun collectText(node: AccessibilityNodeInfo, list: MutableList<String>) {
+        node.text?.let { list.add(it.toString()) }
+        for (i in 0 until node.childCount) {
+            node.getChild(i)?.let { collectText(it, list) }
+        }
+    }
+
+    private fun performClick(node: AccessibilityNodeInfo) {
+        if (node.isClickable) {
+            node.performAction(AccessibilityNodeInfo.ACTION_CLICK)
+            Log.d(TAG, "CLICKED: ${node.text}")
+        } else if (node.parent != null) {
+            performClick(node.parent)
+        }
+    }
+
+    fun performGestureClick(x: Float, y: Float) {
+        val path = Path()
+        path.moveTo(x, y)
+        val gesture = GestureDescription.Builder()
+            .addStroke(GestureDescription.StrokeDescription(path, 0, 100)).build()
         dispatchGesture(gesture, null, null)
     }
 
-    fun performClick(node: AccessibilityNodeInfo) { // Dipake buat klik node TERIMA
-        val bounds = Rect()
-        node.getBoundsInScreen(bounds)
-        performClick(bounds.centerX(), bounds.centerY())
+    private fun loadSettings() {
+        val prefs = getSharedPreferences("cmbid_prefs", Context.MODE_PRIVATE)
+        interval = prefs.getInt("interval", 300).toLong()
+        clickDelay = prefs.getInt("delay", 150).toLong()
+        hargaMin = prefs.getInt("min", 10000)
+        hargaMax = prefs.getInt("max", 50000)
+        jarakMax = prefs.getInt("jarak", 1000)
+        isRunning = true
     }
 
-    fun performScroll(jarak: Int) {
-        val path = Path().apply {
-            moveTo(500f, 1500f)
-            lineTo(500f, 1500f - jarak)
-        }
-        val gesture = GestureDescription.Builder().addStroke(GestureDescription.StrokeDescription(path, 0, 300)).build()
-        dispatchGesture(gesture, null, null)
-    }
+    override fun onInterrupt() { isRunning = false; scanJob?.cancel() }
+    override fun onDestroy() { super.onDestroy(); serviceScope.cancel(); isRunning = false }
 }
