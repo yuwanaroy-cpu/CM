@@ -4,8 +4,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.cm.databinding.ItemRowBinding
-import com.cm.model.Point // PENTING
-import java.util.ArrayList // PENTING
+import com.cm.model.Point
+import java.util.ArrayList
 
 class PointAdapter(private val list: ArrayList<Point>) :
     RecyclerView.Adapter<PointAdapter.ViewHolder>() {
