@@ -14,11 +14,11 @@
 
         android:allowBackup="true"
 
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/cm_icon"
+
+        android:roundIcon="@drawable/cm_icon"
 
         android:label="CM AUTO BID"
-
-        android:roundIcon="@mipmap/ic_launcher_round"
 
         android:supportsRtl="true"
 
