@@ -2,82 +2,56 @@
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- Overlay / Floating -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
-    <!-- Accessibility Service -->
+    <!-- Accessibility -->
     <uses-permission android:name="android.permission.BIND_ACCESSIBILITY_SERVICE" />
 
-    <!-- Background service -->
+    <!-- Foreground Service -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
-
-
     <application
-
         android:allowBackup="true"
-
         android:icon="@drawable/cm_icon"
-
         android:roundIcon="@drawable/cm_icon"
-
         android:label="CM AUTO BID"
-
         android:supportsRtl="true"
-
         android:theme="@style/Theme.CM">
 
-
-        <!-- Main Screen -->
-
+        <!-- Main Activity -->
         <activity
-
             android:name=".MainActivity"
-
             android:exported="true">
 
-
             <intent-filter>
-
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
-
             </intent-filter>
-
 
         </activity>
 
-
-
-        <!-- Auto Click Accessibility Service -->
-
+        <!-- Floating Service -->
         <service
+            android:name=".service.FloatingService"
+            android:exported="false" />
 
+        <!-- Accessibility Service -->
+        <service
             android:name=".service.CMAccessibilityService"
-
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
-
             android:exported="true">
 
-
             <intent-filter>
-
                 <action android:name="android.accessibilityservice.AccessibilityService" />
-
             </intent-filter>
 
-
             <meta-data
-
                 android:name="android.accessibilityservice"
-
                 android:resource="@xml/accessibility_config" />
-
 
         </service>
 
-
     </application>
-
 
 </manifest>
