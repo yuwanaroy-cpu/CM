@@ -1,7 +1,0 @@
-package com.cm
-
-data class Point(
-    val min: Int,
-    val max: Int,
-    val jarak: Int
-)
