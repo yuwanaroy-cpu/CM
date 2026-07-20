@@ -1,5 +1,8 @@
 package com.cm
 
+import android.content.Intent
+import android.provider.Settings
+import com.cm.service.CMAccessibilityService
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
