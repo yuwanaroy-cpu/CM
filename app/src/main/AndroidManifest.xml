@@ -1,94 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <uses-sdk
-        android:minSdkVersion="24"
-        android:targetSdkVersion="34" />
-
-    <!-- ========== PERMISSIONS ========== -->
-    <!-- Overlay / Floating -->
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-
-    <!-- Foreground Service -->
+    <!-- IZIN MINIMALIS -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
-
-    <!-- Boot & Wake -->
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-
-    <!-- Network -->
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-
-    <!-- Storage -->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/cm_icon"
-        android:roundIcon="@drawable/cm_icon"
+        android:icon="@mipmap/ic_launcher"
         android:label="CM BID"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.CMBid"
-        tools:targetApi="34">
-
-        <!-- ========== ACTIVITY ========== -->
+        android:theme="@style/Theme.CMBID">
+        
         <activity
             android:name=".MainActivity"
-            android:exported="true"
-            android:launchMode="singleTask"
-            android:screenOrientation="portrait">
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <!-- ========== SERVICES ========== -->
-        
-        <!-- 1. FOREGROUND SERVICE - Notifikasi Permanen -->
-        <service
-            android:name=".service.CMForegroundService"
-            android:foregroundServiceType="dataSync"
-            android:exported="false" />
-
-        <!-- 2. FLOATING SERVICE - Tombol Melayang -->
-        <service
-            android:name=".service.FloatingService"
-            android:exported="false" />
-
-        <!-- 3. ACCESSIBILITY SERVICE - Inti Auto Click -->
+        <!-- ACCESSIBILITY SERVICE -->
         <service
             android:name=".service.CMAccessibilityService"
-            android:label="CM BID Service"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
-            android:exported="true">
-
+            android:exported="true"
+            android:label="CM BID Auto Click">
             <intent-filter>
                 <action android:name="android.accessibilityservice.AccessibilityService" />
             </intent-filter>
-
             <meta-data
                 android:name="android.accessibilityservice"
-                android:resource="@xml/accessibility_config" />
-
+                android:resource="@xml/accessibility_service_config" />
         </service>
 
-        <!-- ========== RECEIVER ========== -->
-        
-        <!-- 4. BOOT RECEIVER - Auto Start -->
-        <receiver
-            android:name=".receiver.BootReceiver"
-            android:exported="true"
-            android:enabled="true">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
-            </intent-filter>
-        </receiver>
+        <!-- FOREGROUND SERVICE -->
+        <service
+            android:name=".service.CMForegroundService"
+            android:exported="false" />
+
+        <!-- FLOATING SERVICE -->
+        <service
+            android:name=".service.FloatingService"
+            android:exported="false" />
 
     </application>
 
