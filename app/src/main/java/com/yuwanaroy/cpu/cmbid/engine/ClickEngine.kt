@@ -1,34 +1,21 @@
 package com.yuwanaroy.cpu.cmbid.engine
 
 import android.content.Context
-import android.os.Handler
-import android.os.Looper
-import com.yuwanaroy.cpu.cmbid.CMAccessibilityService
+import com.yuwanaroy.cpu.cmbid.model.ClickPoint
+import com.yuwanaroy.cpu.cmbid.service.CMAccessibilityService
 
 object ClickEngine {
-    private lateinit var context: Context
-    private val handler = Handler(Looper.getMainLooper())
-    private var isRunning = false
+    private var context: Context? = null
 
     fun init(ctx: Context) {
         context = ctx.applicationContext
     }
 
-    fun startAutoClick(x: Float, y: Float, delay: Long = 1000L) {
-        if (isRunning) return
-        isRunning = true
-        runClick(x, y, delay)
-    }
-
-    private fun runClick(x: Float, y: Float, delay: Long) {
-        handler.postDelayed({
-            CMAccessibilityService.instance?.performClick(x, y)
-            if (isRunning) runClick(x, y, delay)
-        }, delay)
+    fun startAutoClick(points: List<ClickPoint>) {
+        CMAccessibilityService.instance?.doAutoClick(points)
     }
 
     fun stopAutoClick() {
-        isRunning = false
-        handler.removeCallbacksAndMessages(null)
+        // Buat simpel kita stop di MainActivity aja dengan flag
     }
 }
