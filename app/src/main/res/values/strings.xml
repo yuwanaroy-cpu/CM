@@ -1,5 +1,8 @@
-<string name="app_name">CM Bid</string>
-<string name="add_point">Tambah Titik</string>
-<string name="start">Start</string>
-<string name="stop">Stop</string>
-<string name="delay_ms">ms</string>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">CM Bid</string>
+    <string name="add_point">Tambah Titik</string>
+    <string name="start">Start</string>
+    <string name="stop">Stop</string>
+    <string name="delay_ms">ms</string>
+</resources>
