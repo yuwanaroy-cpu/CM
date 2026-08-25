@@ -12,20 +12,22 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.Button
 import android.widget.Toast
+import com.yuwanaroy.cpu.cmbid.R
 
 class FloatingService : Service() {
 
     private lateinit var windowManager: WindowManager
     private lateinit var floatingView: View
-    private var params: WindowManager.LayoutParams? = null
+    private lateinit var params: WindowManager.LayoutParams
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate() {
         super.onCreate()
         windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
 
-        floatingView = LayoutInflater.from(this).inflate(android.R.layout.simple_button, null)
-        val btn = Button(this).apply { text = "Titik" }
+        // 1. Pake layout_floating_widget.xml
+        floatingView = LayoutInflater.from(this).inflate(R.layout_floating_widget, null)
+        val btnFloating = floatingView.findViewById<Button>(R.id.btnFloating)
 
         params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT,
@@ -35,39 +37,40 @@ class FloatingService : Service() {
             PixelFormat.TRANSLUCENT
         )
 
-        params!!.gravity = Gravity.TOP or Gravity.START
-        params!!.x = 100
-        params!!.y = 100
+        params.gravity = Gravity.TOP or Gravity.START
+        params.x = 100
+        params.y = 100
 
-        windowManager.addView(btn, params)
+        windowManager.addView(floatingView, params)
 
-        // Geser tombol
+        // 2. Logic Geser + Tap
         var lastX = 0
         var lastY = 0
         var firstX = 0
         var firstY = 0
 
-        btn.setOnTouchListener { v, event ->
+        btnFloating.setOnTouchListener { _, event ->
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     firstX = event.rawX.toInt()
                     firstY = event.rawY.toInt()
-                    lastX = params!!.x
-                    lastY = params!!.y
+                    lastX = params.x
+                    lastY = params.y
                     true
                 }
                 MotionEvent.ACTION_MOVE -> {
-                    params!!.x = lastX + (event.rawX.toInt() - firstX)
-                    params!!.y = lastY + (event.rawY.toInt() - firstY)
-                    windowManager.updateViewLayout(btn, params)
+                    params.x = lastX + (event.rawX.toInt() - firstX)
+                    params.y = lastY + (event.rawY.toInt() - firstY)
+                    windowManager.updateViewLayout(floatingView, params)
                     true
                 }
                 MotionEvent.ACTION_UP -> {
-                    // Kalau cuma tap, bukan geser
+                    // Kalau jarak geser < 10px berarti itu Tap
                     if (kotlin.math.abs(event.rawX.toInt() - firstX) < 10 && kotlin.math.abs(event.rawY.toInt() - firstY) < 10) {
                         val x = event.rawX
                         val y = event.rawY
-                        Toast.makeText(this, "Titik: X=$x, Y=$y", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Titik Tersimpan: X=${x.toInt()}, Y=${y.toInt()}", Toast.LENGTH_SHORT).show()
+                        
                         // Kirim ke MainActivity
                         val intent = Intent("NEW_CLICK_POINT")
                         intent.putExtra("x", x)
@@ -83,7 +86,9 @@ class FloatingService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
-        // windowManager.removeView(floatingView) // kalau pake layout
+        if (::floatingView.isInitialized) {
+            windowManager.removeView(floatingView)
+        }
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
