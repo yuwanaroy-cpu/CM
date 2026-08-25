@@ -1,225 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:background="#F5F5F7"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
 
     <LinearLayout
-        android:orientation="vertical"
-        android:padding="16dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-
-        <!-- HEADER -->
-        <LinearLayout
-            android:background="#6A4C93"
-            android:padding="20dp"
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp">
-
-            <TextView
-                android:text="CM AUTO BID"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                android:textColor="#FFFFFF"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-
-
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_marginTop="8dp"
-                android:background="#4A306D"
-                android:padding="8dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    android:text="Status : "
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-
-                <TextView
-                    android:id="@+id/tvStatus"
-                    android:text="STOP"
-                    android:textColor="#FF5252"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-
-
-        <!-- KECEPATAN -->
-
-        <LinearLayout
-            android:background="#FFFFFF"
-            android:padding="16dp"
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-
-            <TextView
-                android:text="PENGATURAN KECEPATAN"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                android:textColor="#6A4C93"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-
-
-            <TextView
-                android:text="Interval (ms)"
-                android:textSize="12sp"
-                android:textColor="#555"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-
-
-            <EditText
-                android:id="@+id/etInterval"
-                android:hint="300"
-                android:inputType="number"
-                android:layout_width="match_parent"
-                android:layout_height="45dp"/>
-
-
-            <TextView
-                android:text="Delay (ms)"
-                android:textSize="12sp"
-                android:textColor="#555"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-
-
-            <EditText
-                android:id="@+id/etDelay"
-                android:hint="150"
-                android:inputType="number"
-                android:layout_width="match_parent"
-                android:layout_height="45dp"/>
-
-        </LinearLayout>
-
-
-
-
-        <!-- ATURAN BID -->
-
-        <LinearLayout
-            android:background="#FFFFFF"
-            android:padding="16dp"
-            android:orientation="vertical"
-            android:layout_marginTop="12dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-
-            <TextView
-                android:text="ATURAN BID"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                android:textColor="#6A4C93"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-
-
-            <TextView
-                android:text="Harga Minimal"
-                android:textSize="12sp"
-                android:textColor="#555"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-
-
-            <EditText
-                android:id="@+id/etMin"
-                android:hint="10000"
-                android:inputType="number"
-                android:layout_width="match_parent"
-                android:layout_height="45dp"/>
-
-
-            <TextView
-                android:text="Harga Maksimal"
-                android:textSize="12sp"
-                android:textColor="#555"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-
-
-            <EditText
-                android:id="@+id/etMax"
-                android:hint="50000"
-                android:inputType="number"
-                android:layout_width="match_parent"
-                android:layout_height="45dp"/>
-
-
-            <TextView
-                android:text="Jarak Maksimal (Meter)"
-                android:textSize="12sp"
-                android:textColor="#555"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-
-
-            <EditText
-                android:id="@+id/etJarak"
-                android:hint="1000"
-                android:inputType="number"
-                android:layout_width="match_parent"
-                android:layout_height="45dp"/>
-
-
-        </LinearLayout>
-
-
-
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
         <Button
             android:id="@+id/btnAddPoint"
-            android:text="SIMPAN PENGATURAN"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"/>
-
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Tambah Titik" />
 
         <Button
             android:id="@+id/btnStart"
-            android:text="MULAI"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"/>
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Start" />
 
-
-
-        <TextView
-            android:text="DAFTAR PENGATURAN"
-            android:textSize="13sp"
-            android:textStyle="bold"
-            android:textColor="#6A4C93"
-            android:layout_marginTop="20dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
-
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvPoint"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"/>
-
-
+        <Button
+            android:id="@+id/btnStop"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Stop" />
     </LinearLayout>
 
-</ScrollView>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvPoints"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="16dp" />
+
+</LinearLayout>
