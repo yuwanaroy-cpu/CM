@@ -1,130 +1,63 @@
 package com.yuwanaroy.cpu.cmbid
 
-import android.Manifest
-import android.content.Context
 import android.content.Intent
-import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
-import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.yuwanaroy.cpu.cmbid.service.CMForegroundService
-import com.yuwanaroy.cpu.cmbid.service.FloatingService
+import com.yuwanaroy.cpu.cmbid.databinding.ActivityMainBinding
+import com.yuwanaroy.cpu.cmbid.engine.ClickEngine
+import com.yuwanaroy.cpu.cmbid.model.ClickPoint
+import com.yuwanaroy.cpu.cmbid.utils.PreferenceManager
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var tvStatus: TextView
-    private lateinit var etInterval: EditText
-    private lateinit var etDelay: EditText
-    private lateinit var etMin: EditText
-    private lateinit var etMax: EditText
-    private lateinit var etJarak: EditText
-    private lateinit var btnAddPoint: Button
-    private lateinit var btnStart: Button
-    private lateinit var rvPoint: RecyclerView
-
-    private var isRunning = false
-
-    // Minta izin notifikasi Android 13+
-    private val requestPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { }
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var adapter: ItemAdapter
+    private val clickList = mutableListOf<ClickPoint>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main) // INI LAYOUT KAMU
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        initViews()
-        setupPermissions()
-        setupClick()
+        setupRecyclerView()
+        setupButtons()
     }
 
-    private fun initViews() {
-        tvStatus = findViewById(R.id.tvStatus)
-        etInterval = findViewById(R.id.etInterval)
-        etDelay = findViewById(R.id.etDelay)
-        etMin = findViewById(R.id.etMin)
-        etMax = findViewById(R.id.etMax)
-        etJarak = findViewById(R.id.etJarak)
-        btnAddPoint = findViewById(R.id.btnAddPoint)
-        btnStart = findViewById(R.id.btnStart)
-        rvPoint = findViewById(R.id.rvPoint)
-
-        rvPoint.layoutManager = LinearLayoutManager(this)
-        // Nanti kita isi adapter buat DAFTAR PENGATURAN
+    private fun setupRecyclerView() {
+        adapter = ItemAdapter(clickList) { position ->
+            clickList.removeAt(position)
+            adapter.notifyItemRemoved(position)
+        }
+        binding.rvClickList.layoutManager = LinearLayoutManager(this)
+        binding.rvClickList.adapter = adapter
     }
 
-    private fun setupPermissions() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-        }
-
-        if (!Settings.canDrawOverlays(this)) {
-            val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
-            startActivity(intent)
-            Toast.makeText(this, "Aktifkan 'Tampilkan di atas aplikasi lain'", Toast.LENGTH_LONG).show()
-        }
-
-        if (!isAccessibilityServiceEnabled()) {
-            Toast.makeText(this, "Aktifkan Layanan Aksesibilitas CM BID", Toast.LENGTH_LONG).show()
+    private fun setupButtons() {
+        binding.btnEnableService.setOnClickListener {
+            // Simpan state ke prefs
+            PreferenceManager.setServiceEnabled(this, true)
+            // Arahkan ke setting Accessibility
             startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
         }
-    }
 
-    private fun setupClick() {
-        btnAddPoint.setOnClickListener {
-            // Simpan setting ke SharedPreferences / List
-            saveSettings()
-            Toast.makeText(this, "Pengaturan Disimpan", Toast.LENGTH_SHORT).show()
-        }
-
-        btnStart.setOnClickListener {
-            if (!isRunning) {
-                startService(Intent(this, CMForegroundService::class.java))
-                startService(Intent(this, FloatingService::class.java))
-                isRunning = true
-                tvStatus.text = "JALAN"
-                tvStatus.setTextColor(resources.getColor(android.R.color.holo_green_dark, theme))
-                btnStart.text = "BERHENTI"
-            } else {
-                stopService(Intent(this, CMForegroundService::class.java))
-                stopService(Intent(this, FloatingService::class.java))
-                isRunning = false
-                tvStatus.text = "STOP"
-                tvStatus.setTextColor(resources.getColor(android.R.color.holo_red_dark, theme))
-                btnStart.text = "MULAI"
+        binding.btnStart.setOnClickListener {
+            // Contoh: jalanin klik di titik pertama
+            if (clickList.isNotEmpty()) {
+                val point = clickList[0]
+                ClickEngine.startAutoClick(point.x, point.y, point.delay)
             }
         }
-    }
 
-    private fun saveSettings() {
-        val interval = etInterval.text.toString().toIntOrNull() ?: 300
-        val delay = etDelay.text.toString().toIntOrNull() ?: 150
-        val min = etMin.text.toString().toIntOrNull() ?: 10000
-        val max = etMax.text.toString().toIntOrNull() ?: 50000
-        val jarak = etJarak.text.toString().toIntOrNull() ?: 1000
-
-        val prefs = getSharedPreferences("cmbid_prefs", Context.MODE_PRIVATE)
-        prefs.edit().apply {
-            putInt("interval", interval)
-            putInt("delay", delay)
-            putInt("min", min)
-            putInt("max", max)
-            putInt("jarak", jarak)
-            apply()
+        binding.btnStop.setOnClickListener {
+            ClickEngine.stopAutoClick()
         }
-    }
 
-    private fun isAccessibilityServiceEnabled(): Boolean {
-        val expectedComponentName = "$packageName/.service.CMAccessibilityService"
-        val services = Settings.Secure.getString(contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES)
-        return services?.contains(expectedComponentName) == true
+        binding.btnAddPoint.setOnClickListener {
+            // Contoh nambah titik dummy. Nanti bisa diganti pake overlay buat pilih titik
+            clickList.add(ClickPoint(x = 500f, y = 1000f, delay = 1000L))
+            adapter.notifyItemInserted(clickList.size - 1)
+        }
     }
 }
