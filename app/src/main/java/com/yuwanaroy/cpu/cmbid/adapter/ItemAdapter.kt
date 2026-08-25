@@ -22,36 +22,50 @@ class ItemAdapter(
         val tvPoint: TextView = itemView.findViewById(R.id.tvPoint)
         val etDelay: EditText = itemView.findViewById(R.id.etDelay)
         val btnDelete: Button = itemView.findViewById(R.id.btnDelete)
+        var textWatcher: TextWatcher? = null
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
-           .inflate(R.layout.item_point, parent, false) // pake item_point.xml punya kamu
+            .inflate(R.layout.item_point, parent, false)
         return ViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val point = list[position]
         holder.tvPoint.text = "X: ${point.x.toInt()}, Y: ${point.y.toInt()}"
+
+        // Lepas listener lama untuk mencegah bug saat recyclerview di-scroll
+        holder.textWatcher?.let { holder.etDelay.removeTextChangedListener(it) }
+
         holder.etDelay.setText(point.delay.toString())
 
-        // Update delay pas diketik
-        holder.etDelay.addTextChangedListener(object : TextWatcher {
+        // Buat TextWatcher baru
+        val newWatcher = object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                val newDelay = s.toString().toLongOrNull()?: 1000L
-                list[position].delay = newDelay
-                pref.saveClickPoints(list) // langsung save
+                val newDelay = s.toString().toLongOrNull() ?: 1000L
+                
+                // Pastikan variabel 'delay' di data class/model 'ClickPoint' diubah menjadi 'var'!
+                list[holder.bindingAdapterPosition].delay = newDelay 
+                pref.saveClickPoints(list)
             }
+
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-        })
+        }
+
+        holder.etDelay.addTextChangedListener(newWatcher)
+        holder.textWatcher = newWatcher
 
         // Tombol Hapus
         holder.btnDelete.setOnClickListener {
-            list.removeAt(position)
-            pref.saveClickPoints(list)
-            notifyItemRemoved(position)
-            notifyItemRangeChanged(position, list.size)
+            val currentPos = holder.bindingAdapterPosition
+            if (currentPos != RecyclerView.NO_POSITION) {
+                list.removeAt(currentPos)
+                pref.saveClickPoints(list)
+                notifyItemRemoved(currentPos)
+                notifyItemRangeChanged(currentPos, list.size)
+            }
         }
     }
 
