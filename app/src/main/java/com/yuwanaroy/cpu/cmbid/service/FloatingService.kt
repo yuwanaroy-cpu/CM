@@ -1,5 +1,6 @@
 package com.yuwanaroy.cpu.cmbid.service
 
+import android.annotation.SuppressLint
 import android.app.Service
 import android.content.Intent
 import android.graphics.PixelFormat
@@ -10,21 +11,21 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
 import android.widget.Button
-import com.yuwanaroy.cpu.cmbid.R
+import android.widget.Toast
 
 class FloatingService : Service() {
 
     private lateinit var windowManager: WindowManager
     private lateinit var floatingView: View
-    private lateinit var params: WindowManager.LayoutParams
+    private var params: WindowManager.LayoutParams? = null
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate() {
         super.onCreate()
-
         windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
 
-        floatingView = LayoutInflater.from(this)
-            .inflate(R.layout.layout_floating_widget, null)
+        floatingView = LayoutInflater.from(this).inflate(android.R.layout.simple_button, null)
+        val btn = Button(this).apply { text = "Titik" }
 
         params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT,
@@ -34,54 +35,55 @@ class FloatingService : Service() {
             PixelFormat.TRANSLUCENT
         )
 
-        params.gravity = Gravity.TOP or Gravity.START
-        params.x = 50
-        params.y = 100
+        params!!.gravity = Gravity.TOP or Gravity.START
+        params!!.x = 100
+        params!!.y = 100
 
-        windowManager.addView(floatingView, params)
+        windowManager.addView(btn, params)
 
-        setupDrag()
-
-        floatingView.findViewById<Button>(R.id.btnStopFloating)
-            .setOnClickListener {
-                sendBroadcast(Intent("ACTION_STOP_CM_BID"))
-                stopSelf()
-            }
-    }
-
-    private fun setupDrag() {
+        // Geser tombol
         var lastX = 0
         var lastY = 0
+        var firstX = 0
+        var firstY = 0
 
-        floatingView.setOnTouchListener { _, event ->
+        btn.setOnTouchListener { v, event ->
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
-                    lastX = event.rawX.toInt()
-                    lastY = event.rawY.toInt()
+                    firstX = event.rawX.toInt()
+                    firstY = event.rawY.toInt()
+                    lastX = params!!.x
+                    lastY = params!!.y
+                    true
                 }
-
                 MotionEvent.ACTION_MOVE -> {
-                    val dx = event.rawX.toInt() - lastX
-                    val dy = event.rawY.toInt() - lastY
-
-                    params.x += dx
-                    params.y += dy
-
-                    windowManager.updateViewLayout(floatingView, params)
-
-                    lastX = event.rawX.toInt()
-                    lastY = event.rawY.toInt()
+                    params!!.x = lastX + (event.rawX.toInt() - firstX)
+                    params!!.y = lastY + (event.rawY.toInt() - firstY)
+                    windowManager.updateViewLayout(btn, params)
+                    true
                 }
+                MotionEvent.ACTION_UP -> {
+                    // Kalau cuma tap, bukan geser
+                    if (kotlin.math.abs(event.rawX.toInt() - firstX) < 10 && kotlin.math.abs(event.rawY.toInt() - firstY) < 10) {
+                        val x = event.rawX
+                        val y = event.rawY
+                        Toast.makeText(this, "Titik: X=$x, Y=$y", Toast.LENGTH_SHORT).show()
+                        // Kirim ke MainActivity
+                        val intent = Intent("NEW_CLICK_POINT")
+                        intent.putExtra("x", x)
+                        intent.putExtra("y", y)
+                        sendBroadcast(intent)
+                    }
+                    true
+                }
+                else -> false
             }
-            true
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        if (::floatingView.isInitialized) {
-            windowManager.removeView(floatingView)
-        }
+        // windowManager.removeView(floatingView) // kalau pake layout
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
