@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Button xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/btnStopFloating"
-    android:layout_width="100dp"
-    android:layout_height="50dp"
-    android:text="STOP"
-    android:textStyle="bold"
+    android:id="@+id/btnFloating"
+    android:layout_width="60dp"
+    android:layout_height="60dp"
+    android:text="TITIK"
+    android:background="@drawable/circle_button"
     android:textColor="#FFFFFF"
-    android:background="#D32F2F"
-    android:elevation="8dp" />
+    android:textStyle="bold" />
