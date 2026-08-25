@@ -3,7 +3,7 @@
     android:label="@string/app_name"
     android:description="@string/desc_service"
     android:accessibilityEventTypes="typeAllMask"
-    android:packageNames="sinet.startup.inDriver,sinet.startup.inDriverr"
+    android:packageNames="sinet.startup.inDriver"
     android:accessibilityFeedbackType="feedbackGeneric"
     android:notificationTimeout="100"
     android:accessibilityFlags="flagDefault|flagIncludeNotImportantViews|flagReportViewIds"
