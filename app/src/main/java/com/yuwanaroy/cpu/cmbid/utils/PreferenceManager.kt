@@ -1,33 +1,22 @@
 package com.yuwanaroy.cpu.cmbid.utils
 
 import android.content.Context
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import com.yuwanaroy.cpu.cmbid.model.ClickPoint
 
 class PreferenceManager(context: Context) {
+    private val prefs = context.getSharedPreferences("CM_PREFS", Context.MODE_PRIVATE)
+    private val gson = Gson()
 
-    private val prefs =
-        context.getSharedPreferences("cm_settings", Context.MODE_PRIVATE)
+    fun saveClickPoints(list: List<ClickPoint>) {
+        val json = gson.toJson(list)
+        prefs.edit().putString("CLICK_POINTS", json).apply()
+    }
 
-    var interval: Int
-        get() = prefs.getInt("interval", 100)
-        set(value) = prefs.edit().putInt("interval", value).apply()
-
-    var delay: Int
-        get() = prefs.getInt("delay", 0)
-        set(value) = prefs.edit().putInt("delay", value).apply()
-
-    var distanceEnabled: Boolean
-        get() = prefs.getBoolean("distance_enabled", false)
-        set(value) = prefs.edit().putBoolean("distance_enabled", value).apply()
-
-    var minPrice: Int
-        get() = prefs.getInt("min_price", 0)
-        set(value) = prefs.edit().putInt("min_price", value).apply()
-
-    var maxPrice: Int
-        get() = prefs.getInt("max_price", 100000)
-        set(value) = prefs.edit().putInt("max_price", value).apply()
-
-    var distance: Int
-        get() = prefs.getInt("distance", 1000)
-        set(value) = prefs.edit().putInt("distance", value).apply()
+    fun getClickPoints(): MutableList<ClickPoint> {
+        val json = prefs.getString("CLICK_POINTS", "[]")
+        val type = object : TypeToken<MutableList<ClickPoint>>() {}.type
+        return gson.fromJson(json, type)?: mutableListOf()
+    }
 }
