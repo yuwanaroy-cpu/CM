@@ -51,7 +51,7 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.recyclerview:recyclerview:1.3.2")
     
-    // PERBAIKAN: Dependency Gson ditambahkan di sini
+    // TAMBAHAN INI UNTUK MENGATASI ERROR GSON:
     implementation("com.google.code.gson:gson:2.10.1")
 
     testImplementation("junit:junit:4.13.2")
