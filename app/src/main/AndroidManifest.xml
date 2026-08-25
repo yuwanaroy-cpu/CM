@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.yuwanaroy.cpu.cmbid">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Izin buat nampilin tombol melayang -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
 
     <application
@@ -11,20 +9,18 @@
         android:label="@string/app_name"
         android:roundIcon="@drawable/cm_icon"
         android:supportsRtl="true"
-        android:theme="@style/Theme.CM">
+        android:theme="@style/Theme.CMBID"> <!-- INI DIGANTI -->
         
-        <!-- Activity Utama -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.CM">
+            android:theme="@style/Theme.CMBID"> <!-- INI JUGA -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <!-- Service buat Auto Click -->
         <service
             android:name=".service.CMAccessibilityService"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
@@ -37,7 +33,6 @@
                 android:resource="@xml/accessibility_service_config" />
         </service>
 
-        <!-- Service buat Tombol Melayang -->
         <service
             android:name=".service.FloatingService"
             android:exported="false" />
